@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace DAL.Migrations
 {
     [DbContext(typeof(LibraryManagementDbContext))]
-    [Migration("20241210085353_Initial")]
+    [Migration("20241211080342_Initial")]
     partial class Initial
     {
         /// <inheritdoc />
@@ -94,6 +94,9 @@ namespace DAL.Migrations
                     b.Property<int>("CategoryId")
                         .HasColumnType("int");
 
+                    b.Property<bool>("IsBorrowed")
+                        .HasColumnType("bit");
+
                     b.Property<double>("Price")
                         .HasColumnType("float");
 
@@ -108,18 +111,121 @@ namespace DAL.Migrations
                         .HasMaxLength(200)
                         .HasColumnType("nvarchar(200)");
 
-                    b.Property<int?>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.HasIndex("AuthorId");
 
                     b.HasIndex("CategoryId");
 
+                    b.ToTable("Books");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            AuthorId = 1,
+                            CategoryId = 1,
+                            IsBorrowed = false,
+                            Price = 39.990000000000002,
+                            PublishedDate = new DateTime(1997, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Stock = 10,
+                            Title = "Harry Potter and the Philosopher's Stone"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            AuthorId = 2,
+                            CategoryId = 2,
+                            IsBorrowed = false,
+                            Price = 49.990000000000002,
+                            PublishedDate = new DateTime(1687, 7, 5, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Stock = 5,
+                            Title = "Principia Mathematica"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            AuthorId = 3,
+                            CategoryId = 1,
+                            IsBorrowed = false,
+                            Price = 29.989999999999998,
+                            PublishedDate = new DateTime(1949, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Stock = 7,
+                            Title = "1984"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            AuthorId = 4,
+                            CategoryId = 2,
+                            IsBorrowed = false,
+                            Price = 34.990000000000002,
+                            PublishedDate = new DateTime(1916, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Stock = 3,
+                            Title = "Relativity: The Special and General Theory"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            AuthorId = 5,
+                            CategoryId = 5,
+                            IsBorrowed = false,
+                            Price = 59.990000000000002,
+                            PublishedDate = new DateTime(1952, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Stock = 2,
+                            Title = "The Notebooks of Leonardo da Vinci"
+                        });
+                });
+
+            modelBuilder.Entity("DAL.Models.Entities.BorrowingHistory", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("BookId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("BorrowedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<double>("LateFee")
+                        .HasColumnType("float");
+
+                    b.Property<DateTime?>("ReturnedDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("BookId");
+
                     b.HasIndex("UserId");
 
-                    b.ToTable("Books");
+                    b.ToTable("BorrowingHistories");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BookId = 1,
+                            BorrowedDate = new DateTime(2024, 12, 1, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(2065),
+                            LateFee = 0.0,
+                            ReturnedDate = new DateTime(2024, 12, 9, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(2070),
+                            UserId = 1
+                        },
+                        new
+                        {
+                            Id = 2,
+                            BookId = 2,
+                            BorrowedDate = new DateTime(2024, 11, 26, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(2076),
+                            LateFee = 0.0,
+                            UserId = 2
+                        });
                 });
 
             modelBuilder.Entity("DAL.Models.Entities.Category", b =>
@@ -205,6 +311,28 @@ namespace DAL.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("Users");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            CreatedAt = new DateTime(2024, 12, 11, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(1612),
+                            Email = "rohan@gmail.com",
+                            IsActive = true,
+                            PasswordHash = "$2a$12$TcF6EKxfOoayF7Q6yNlP/.0KkvV5xGgfAZ3XOU1GG.0XjK1J45o1a",
+                            Role = "User",
+                            UserName = "Rohan"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            CreatedAt = new DateTime(2024, 12, 11, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(1616),
+                            Email = "rajkumar@gmail.com",
+                            IsActive = true,
+                            PasswordHash = "$2b$12$aKsTfYEsr9OzSJi4/SUWCuUNhYGQcD0GDPwaTgJWRaqOgWm9IZubK",
+                            Role = "Admin",
+                            UserName = "Raj"
+                        });
                 });
 
             modelBuilder.Entity("DAL.Models.Entities.Book", b =>
@@ -221,13 +349,26 @@ namespace DAL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("DAL.Models.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
                     b.Navigation("Author");
 
                     b.Navigation("Category");
+                });
+
+            modelBuilder.Entity("DAL.Models.Entities.BorrowingHistory", b =>
+                {
+                    b.HasOne("DAL.Models.Entities.Book", "Book")
+                        .WithMany("BorrowingHistories")
+                        .HasForeignKey("BookId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("DAL.Models.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Book");
 
                     b.Navigation("User");
                 });
@@ -235,6 +376,11 @@ namespace DAL.Migrations
             modelBuilder.Entity("DAL.Models.Entities.Author", b =>
                 {
                     b.Navigation("Books");
+                });
+
+            modelBuilder.Entity("DAL.Models.Entities.Book", b =>
+                {
+                    b.Navigation("BorrowingHistories");
                 });
 
             modelBuilder.Entity("DAL.Models.Entities.Category", b =>

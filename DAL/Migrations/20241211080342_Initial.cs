@@ -71,7 +71,7 @@ namespace DAL.Migrations
                     PublishedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
                     Price = table.Column<double>(type: "float", nullable: false),
                     Stock = table.Column<int>(type: "int", nullable: false),
-                    UserId = table.Column<int>(type: "int", nullable: true)
+                    IsBorrowed = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,11 +88,35 @@ namespace DAL.Migrations
                         principalTable: "Categories",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "BorrowingHistories",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    BookId = table.Column<int>(type: "int", nullable: false),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    BorrowedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    ReturnedDate = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    LateFee = table.Column<double>(type: "float", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_BorrowingHistories", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Books_Users_UserId",
+                        name: "FK_BorrowingHistories_Books_BookId",
+                        column: x => x.BookId,
+                        principalTable: "Books",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_BorrowingHistories_Users_UserId",
                         column: x => x.UserId,
                         principalTable: "Users",
-                        principalColumn: "Id");
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.InsertData(
@@ -119,6 +143,36 @@ namespace DAL.Migrations
                     { 5, "Art" }
                 });
 
+            migrationBuilder.InsertData(
+                table: "Users",
+                columns: new[] { "Id", "CreatedAt", "Email", "IsActive", "LastLogin", "PasswordHash", "Role", "UserName" },
+                values: new object[,]
+                {
+                    { 1, new DateTime(2024, 12, 11, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(1612), "rohan@gmail.com", true, null, "$2a$12$TcF6EKxfOoayF7Q6yNlP/.0KkvV5xGgfAZ3XOU1GG.0XjK1J45o1a", "User", "Rohan" },
+                    { 2, new DateTime(2024, 12, 11, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(1616), "rajkumar@gmail.com", true, null, "$2b$12$aKsTfYEsr9OzSJi4/SUWCuUNhYGQcD0GDPwaTgJWRaqOgWm9IZubK", "Admin", "Raj" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "Books",
+                columns: new[] { "Id", "AuthorId", "CategoryId", "IsBorrowed", "Price", "PublishedDate", "Stock", "Title" },
+                values: new object[,]
+                {
+                    { 1, 1, 1, false, 39.990000000000002, new DateTime(1997, 6, 26, 0, 0, 0, 0, DateTimeKind.Unspecified), 10, "Harry Potter and the Philosopher's Stone" },
+                    { 2, 2, 2, false, 49.990000000000002, new DateTime(1687, 7, 5, 0, 0, 0, 0, DateTimeKind.Unspecified), 5, "Principia Mathematica" },
+                    { 3, 3, 1, false, 29.989999999999998, new DateTime(1949, 6, 8, 0, 0, 0, 0, DateTimeKind.Unspecified), 7, "1984" },
+                    { 4, 4, 2, false, 34.990000000000002, new DateTime(1916, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 3, "Relativity: The Special and General Theory" },
+                    { 5, 5, 5, false, 59.990000000000002, new DateTime(1952, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), 2, "The Notebooks of Leonardo da Vinci" }
+                });
+
+            migrationBuilder.InsertData(
+                table: "BorrowingHistories",
+                columns: new[] { "Id", "BookId", "BorrowedDate", "LateFee", "ReturnedDate", "UserId" },
+                values: new object[,]
+                {
+                    { 1, 1, new DateTime(2024, 12, 1, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(2065), 0.0, new DateTime(2024, 12, 9, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(2070), 1 },
+                    { 2, 2, new DateTime(2024, 11, 26, 8, 3, 41, 742, DateTimeKind.Utc).AddTicks(2076), 0.0, null, 2 }
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Books_AuthorId",
                 table: "Books",
@@ -130,8 +184,13 @@ namespace DAL.Migrations
                 column: "CategoryId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Books_UserId",
-                table: "Books",
+                name: "IX_BorrowingHistories_BookId",
+                table: "BorrowingHistories",
+                column: "BookId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_BorrowingHistories_UserId",
+                table: "BorrowingHistories",
                 column: "UserId");
         }
 
@@ -139,16 +198,19 @@ namespace DAL.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
+                name: "BorrowingHistories");
+
+            migrationBuilder.DropTable(
                 name: "Books");
+
+            migrationBuilder.DropTable(
+                name: "Users");
 
             migrationBuilder.DropTable(
                 name: "Authors");
 
             migrationBuilder.DropTable(
                 name: "Categories");
-
-            migrationBuilder.DropTable(
-                name: "Users");
         }
     }
 }

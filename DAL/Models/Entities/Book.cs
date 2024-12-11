@@ -24,12 +24,11 @@ namespace DAL.Models.Entities
         [Range(0, double.MaxValue)]
         public double Price { get; set; }
 
+
         public int Stock { get; set; }
 
-        // Foreign key for the User who borrowed the book
-        public int? UserId { get; set; } // Nullable to allow books not borrowed yet
+        public bool IsBorrowed { get; set; } = false; // Indicates if the book is currently borrowed
 
-        // Navigation property for the relationship with User
-        public User User { get; set; }
+        public ICollection<BorrowingHistory> BorrowingHistories { get; set; } // Navigation property for borrowing history
     }
 }

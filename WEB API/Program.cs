@@ -27,6 +27,10 @@ builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IBookRepository, BookRepository>();
 builder.Services.AddScoped<IBookService, BookService>();
 
+builder.Services.AddScoped<IBorrowingHistoryRepository, BorrowingHistoryRepository>();
+builder.Services.AddScoped<IBorrowingHistoryService, BorrowingHistoryService>();
+
+
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
 
