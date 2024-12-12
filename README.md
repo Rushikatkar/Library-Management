@@ -143,23 +143,5 @@ LibraryManagement
 
 ---
 
-## Contributions
-- **Rushikesh Katkar (Project Lead)**
-  - Set up the overall project structure, ensuring proper folder organization for Controllers, Services, Models, and Data Access layers.
-  - Configured middleware for exception handling, logging, and API versioning.
-  - Integrated Swagger for API documentation and testing.
-  - Created service classes to implement core business logic, including handling complex operations such as calculating late fees for book returns.
-  - Added a new table BorrowingHistories to implement the complex feature of calculating late fees for users who return borrowed books late.
-  - Integrated authentication and authorization using JWT, including role-based access control for admin and user roles.
-  - Coordinated the project workflow and managed the integration of all modules.
-
-- **Abhishek Yadav (Backend Developer)**
-  - Designed and implemented data models for entities such as Book, Author, Category, and User.
-  - Developed the database context using Entity Framework Core (Code-First approach) and applied migrations to set up the database schema.
-  - Documented the project to provide a clear understanding of its structure and functionality.
-  - Performed API unit and integration testing to ensure the reliability and quality of the application.
-
----
-
 ## License
 This project is licensed under the MIT License.
