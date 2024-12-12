@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
+using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.Text;
 
@@ -29,7 +30,6 @@ builder.Services.AddScoped<IBookService, BookService>();
 
 builder.Services.AddScoped<IBorrowingHistoryRepository, BorrowingHistoryRepository>();
 builder.Services.AddScoped<IBorrowingHistoryService, BorrowingHistoryService>();
-
 
 // Add AutoMapper
 builder.Services.AddAutoMapper(typeof(MappingProfile));
@@ -56,15 +56,55 @@ builder.Services.AddAuthentication(options =>
         ValidAudience = builder.Configuration["Jwt:Audience"],
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]))
     };
+
+    // Allow requests without a token
+    options.Events = new JwtBearerEvents
+    {
+        OnMessageReceived = context =>
+        {
+            // Check if the Authorization header is missing
+            if (string.IsNullOrEmpty(context.Request.Headers["Authorization"]))
+            {
+                context.NoResult(); // Skip validation if no token is provided
+            }
+            return Task.CompletedTask;
+        }
+    };
 });
 
-builder.Services.AddSwaggerGen();
+// Add Swagger with JWT Authentication support
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = SecuritySchemeType.Http,
+        Scheme = "Bearer",
+        BearerFormat = "JWT",
+        In = ParameterLocation.Header,
+        Description = "Enter 'Bearer' followed by a space and your token. Leave it blank for public APIs.",
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            new string[] {}
+        }
+    });
+});
 
 var app = builder.Build();
 
 // Use custom exception middleware
 app.UseMiddleware<WEB_API.Middleware.GlobalExceptionMiddleware>();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -73,6 +113,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
+app.UseAuthentication(); // Ensure this is called before Authorization middleware
 app.UseAuthorization();
 
 app.MapControllers();
